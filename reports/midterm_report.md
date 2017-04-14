@@ -1,5 +1,5 @@
 ---
-authors: Alli Nilles (nilles2) and Spencer Gordon (slgordo2)
+author: Alli Nilles (`nilles2`) and Spencer Gordon (`slgordo2`)
 title: CS 476 Intermediate Report
 geometry: margin=2cm
 bibliography: refs.bib
@@ -29,14 +29,16 @@ steady-state graph dynamics. In the course of the project, we have so far
 focused on surveying known computational learning theory results for learning 
 grammars, as well as surveying known results in the theory of graph grammars.
 
-We show that a particular formulation of a concept class is inherently
+We show that a particular formulation of a concept class  is inherently
 unpredictable, under the definition from [@kearns1994]:
 
 > A concept class $C$ is *inherently unpredictable* if the VC dimension of $C_n$
 > is polynomial in $n$, yet $C$ is not efficiently PAC learnable using any
 > polynomially evaluatable hypothesis class $H$.
 
-
+Specifically, we show that learning graph grammars which lead to to stable,
+fully-connected assemblies is inherently unpredictable by reduction to learning
+DFAs.
 
 Graph Grammars
 --------------
