@@ -1,0 +1,140 @@
+fmod GRAPH is
+    
+    including QID + NAT .
+    sorts Label Labels .
+    sorts Id NeIds Ids .
+    sorts Agent Agents NeGraph Graph .
+    subsort Nat < Id < NeIds < Ids . --- all nats are ids
+    subsort Qid < Label < Labels . --- all qids are labels
+    subsort Agent < Agents .
+    subsort NeGraph < Graph .
+
+    op _~_ : Id Label -> Agent .
+
+    --- sets of unique IDs
+    op .Ids : -> Ids [ctor] .
+    op __ : Ids   Ids   -> Ids    [ctor assoc comm id: .Ids prec 35] .
+    op __ : NeIds Ids   -> NeIds  [ctor ditto] .
+
+    var NEID : NeIds .
+    eq NEID NEID = NEID .
+
+    --- make ajacency entry into non-empty graph
+    op _{_} : Agent Ids -> NeGraph [prec 45] .
+
+    op .Graph  : -> Graph [ctor] .
+    op _;_ : Graph Graph -> Graph 
+             [ctor assoc comm id: .Graph prec 60 format(d n d d)] .
+    op _;_ : NeGraph Graph -> NeGraph [ctor ditto] .
+    var NeG : NeGraph .
+    eq NeG ; NeG = NeG .
+
+endfm
+
+mod GR-UTILS is
+
+    extending GRAPH .
+
+    vars Nt : Nat .
+    vars N M : Id .
+    vars Ns Ms : Ids .
+    vars G : NeGraph .
+    vars A B : Label .
+
+    op init    : -> Graph .
+    eq init =     ((1 ~ 'A) { 2 3 }) 
+                ; ((2 ~ 'B) { 1 3 })
+                ; ((3 ~ 'C) { 1 2 }) 
+                ; ((4 ~ 'A) { .Ids }) .
+
+    op mkSoup : Nat -> Graph .
+    eq mkSoup(0) = .Graph .
+    eq mkSoup(s(Nt)) = (s(Nt) ~ 'A) {.Ids} ; mkSoup(Nt) .
+
+    op _in_ : Id Ids -> Bool .
+    eq N in (N Ns) = true .
+    eq N in Ns = false [owise] .
+
+    op idsIn : Graph -> Ids .
+    eq idsIn(.Graph) = .Ids .
+    eq idsIn( (N ~ A){Ns} ; G ) = N idsIn(G) .
+
+    ------ get neighbors of ID in graph. Will only match if ID in graph
+    op neighbors : Id Graph -> Ids .
+    eq neighbors(M, (M ~ A) { Ns } ; G) = Ns .
+ 
+    op areNeighbors : Id Id Graph -> Bool .
+    eq areNeighbors( N , M , G) = (N in neighbors(M, G))
+                                  and (M in neighbors(N, G)) .
+ 
+    op connect : Label Label Graph -> Graph .
+    ceq connect(A,B, (N ~ A){Ns} ; (M ~ B){Ms} ; G) =
+               (N ~ A){Ns M} ; (M ~ B){Ms N} ; G
+               if not (N in Ms) and not (M in Ns) .
+    eq connect(A, B, G) = G [owise] .
+
+endm
+
+mod RUN-GRAMMAR is
+
+    including BOOL + NAT .
+
+    sorts State NeStates States .
+    subsort State < NeStates < States .
+    sorts Command NeProgram Program .
+    subsort Command < NeProgram < Program .
+
+    vars S S1 S2 : NeStates .
+    var C : Command .
+    var P : Program .
+    var N : Nat .
+
+    op .Command : -> Program [ctor] .
+    op skip : -> Program .
+
+    op _;_ : Program Program -> Program [ctor assoc id: .Command] .
+    op _;_ : NeProgram Program -> Program [ctor ditto] .
+    op _;_ : Program NeProgram -> Program [ctor ditto] .
+
+    op .State : -> States [ctor] .
+    op __ : States States -> States [ctor assoc comm id: .State prec 25] .
+    op __ : NeStates States -> NeStates [ctor ditto] .
+
+    op _=====_ : NeStates Program -> NeStates .
+
+    op _[_] : Command NeStates -> NeStates .
+
+
+    ------ distribute a command over a list of states
+    eq C[S1 S2] = (C [S1]) (C [S2]) .
+
+    ------ apply commands one at a time to the list of states
+    rl S ===== (C ; P) => C[S] ===== P .
+
+    op repeat__ : Nat Program -> Program .
+    --------------------------------------
+    eq repeat 0    P = skip .
+    eq repeat s(N) P = P ; repeat N P .
+
+
+endm
+
+mod GRAPH-GRAMMARS is
+
+    extending GR-UTILS + RUN-GRAMMAR .
+
+    subsort Graph < State .
+
+    vars A B : Label .
+    vars G : Graph .
+    op connect : Label Label -> Command .
+    eq connect(A,B)[G] = connect(A, B, G) .
+
+endm
+
+rewrite
+
+mkSoup(3)
+===== 
+
+repeat 300 connect('A, 'A) .
