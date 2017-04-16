@@ -5,7 +5,8 @@ geometry: margin=2cm
 bibliography: refs.bib
 csl: ieee.csl
 header-includes:
-    -   \usepackage{jeffe, graphicx, mathtools, xspace}
+    -   \usepackage{jeffe, graphicx, mathtools, tikz, xspace}
+    -   \usetikzlibrary{arrows.meta}
     -   \usepackage[charter]{mathdesign}
     -   \makeatother
     -   \DeclareMathOperator{\attach}{attach}
@@ -111,9 +112,7 @@ Definitions
 
 
 Let $\RuleSeq_\Sigma$ be a sequence of rules over a finite set of labels
-$\Sigma$, where a rule is one of the following:
-$$\operatorname{attach}(A,B),\quad, \operatorname{relabel}(A,B),\,\text{or}\quad \operatorname{detach}(A, B)$$
-for some $A,B \in \Sigma$.
+$\Sigma$, where a rule is a node-preserving graph rewrite.
 
 Let $\Graphs_{n,\Sigma}$ denote the set of all pairs $(G,\ell)$ where
 $G$ is a graph on vertex set $[n]$ and $\ell : [n] \to \Sigma$ assigns a
@@ -130,18 +129,13 @@ For any $S\in \RuleSeq$, we define the function
 $f_S : \Graphs_{\Sigma} \to \Set{0,1}$ as follows:
 $$f_S(G) = \begin{cases}
     1 &\,\text{if after $N |V(G)|$ steps of ${\step{S}}$ starting with $G$ a
-    stable, fully-connected graph is formed (meaning, we have executed all rules in the rule
-    sequence, or a rule cannot be applied).}\\
+    stable, fully-connected graph is formed.}\\
     0 &\,\text{otherwise}
   \end{cases}$$
 
 Our concept class will be
 $\Concepts_\Sigma = \Setbar{f_S}{S\in \RuleSeq_\Sigma}$. Our hypothesis
 class will be $\Hypotheses_{\Sigma} = \Concepts_\Sigma$.
-
-We are interested in the following question: Can we PAC-learn (or
-efficiently PAC-learn) a hypothesis $h \in \Hypotheses$ given
-equivalence queries and memebership queries?
 
 **Definition [@kearns1994]:** a concept class $C$ over instance space $X$
 PAC-reduces to the concept class $C'$ over instance space $X'$ if the following
@@ -157,7 +151,6 @@ conditions are met:
 
 Preliminary Work
 ----------------
-
 
 **Theorem:** the class of deterministic finite automata PAC-reduces to the class of
 node-conserving graph rewriting rulesets which
@@ -176,15 +169,73 @@ graphs with a number of vertices polynomial in $n$.
 
 Take an instance $x \in \{0,1\}^n$. For each character $s \in x$, create a pair of
 vertices. Label one vertex $a$, and label the other with $b_0$ if $s=0$ and
-$b_1$ if $s=1$. Add one more vertex to the graph and label it $\$$.
+$b_1$ if $s=1$. Add one more vertex to the graph and label it $\lambda$.
 
-If the DFA transitions from state $S$ to state $T$ when it consumes character
-$s$
+An example input transformation for the input $1011$ would be:
+
+\begin{tikzpicture}
+[vertex/.style={circle, draw, fill=black, inner sep=0pt, minimum width=4pt}]
+
+\node[vertex] (1) [label=left:$\lambda$] {};
+\node[vertex] (2) [label=left:$a$] at (0,-1) {};
+\node[vertex] (3) [label=left:$a$] at (0,-2) {};
+\node[vertex] (4) [label=left:$a$] at (0,-3) {};
+\node[vertex] (5) [label=left:$a$] at (0,-4) {};
+
+\node[vertex] (6) [label=right:$b_1$] at (1,-1) {};
+\node[vertex] (7) [label=right:$b_0$] at (1,-2) {};
+\node[vertex] (8) [label=right:$b_1$] at (1,-3) {};
+\node[vertex] (9) [label=right:$b_1$] at (1,-4) {};
+
+\end{tikzpicture}
 
 ### Image Concept
 
-For each state $s \in D$, 
+We create a rule sequence which exactly simulates the allowed transitions in the DFA.
 
+First, assign to each state in the DFA a unique label, using the label $\lambda$
+for the start state.
+
+If the DFA transitions from the state with label $S$ to the state with label $T$
+when it consumes character $s$, add the following rule to the rule sequence:
+
+\begin{tikzpicture}
+[vertex/.style={circle, draw, fill=black, inner sep=0pt, minimum width=4pt}]
+
+\node[vertex] (s) [label=left:$S$] {};
+\node[vertex] (t) [label=left:$a$] at (0,-1) {};
+\node[vertex] (c) [label=right:$b_s$] at (1,-1) {};
+
+\node[vertex] (s2) [label=left:$c$] at (4,0) {};
+\node[vertex] (t2) [label=left:$T$] at (4,-1) {};
+\node[vertex] (c2) [label=right:$c$] at (5,-1) {};
+
+\draw[thick] (s2) -- (t2);
+\draw[thick] (s2) -- (c2);
+\draw[thick] (c2) -- (t2);
+
+\draw[-{Straight Barb[left]}] (2,-0.5) -- (3,-0.5);
+
+\end{tikzpicture}
+
+where $c$ is a reserved label, not corresponding to any of the states of the DFA.
+
+Additionally, add the following rule to the rule sequence:
+
+\begin{tikzpicture}
+[vertex/.style={circle, draw, fill=black, inner sep=0pt, minimum width=4pt}]
+
+\node[vertex] (c) [label=below:$c$] {};
+\node[vertex] (d) [label=below:$c$] at (1,0) {};
+
+\node[vertex] (c2) [label=below:$c$] at (4,0) {};
+\node[vertex] (d2) [label=below:$c$] at (5,0) {};
+
+\draw[thick] (c2) -- (d2);
+
+\draw[-{Straight Barb[left]}] (2,0) -- (3,0);
+
+\end{tikzpicture}
 
 Citations
 ---------
