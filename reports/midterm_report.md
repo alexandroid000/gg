@@ -38,9 +38,9 @@ unpredictable, under the definition from [@kearns1994]:
 
 Specifically, we show that learning graph grammars which lead to to stable,
 fully-connected assemblies is inherently unpredictable by reduction to learning
-DFAs.
+DFAs. We also outline the next areas of investigation in this project.
 
-Graph Grammars
+Refinement of Project Scope
 --------------
 
 We retain the same definition of graph grammars [@litovsky] [@klavins]:
@@ -74,21 +74,28 @@ context-sensitive graph grammars have recieved relatively little.
 The application to self-assembling robotic systems motivates the choice to focus
 on context-sensitive graph grammars: often, we have a collection of $n$ robots
 and wish to produce a set of locally executable rules that result in the
-collection of robots forming a connected assembly with certain topological or
+entire collection of robots forming a connected assembly with certain topological or
 connectivity properties.
 
-### A more specific scope
+### Our concept class of interest
 
 In particular, we are interested in *programmed context-sensitive graph
 replacement systems*, as described in [@gg_handbook]. This area of research
 introduces control-flow statements for specifying the order of application of
-rules: for instance, we may specify that while rule 1 applies, apply it; then
+rules: for instance, we may specify that while rule 1 applies, apply it
+repeatedly; then
 apply rule 2 until rule 1 is applicable again. Such "programmable" graph
-rewriting specifications can be used for decision procedures: in this paper, we
-will examine the case where we apply rules in a given order for a number of
+rewriting specifications can be used for decision procedures.
+
+In this paper, we
+will examine the case where we apply a given sequence of rules for a number of
 iterations that is proportional to the size of the overall graph. After this
 number of rewrites, we examine the graph - if it is fully connected, we consider
 this an "accepting" state, and otherwise we reject.
+
+Additionally, we will consider only *node-preserving* rewrites, in which the
+number of nodes on the left and right sides of the rewrite are the same. Edges
+may be added and removed in a rewrite, and labels may change.
 
 Is this concept class efficiently PAC learnable? If not, what constraints can we
 add to the concept class to make it learnable? Likewise, if not, what
@@ -97,8 +104,11 @@ equivalence queries) do we need to add to make the concept learnable? In this
 fashion we are exploring the "frontier" of learnable concept classes and
 learning models in this relatively unexplored formulation of graph grammars.
 
-Preliminary Results
---------------
+
+
+Definitions
+-----------
+
 
 Let $\RuleSeq_\Sigma$ be a sequence of rules over a finite set of labels
 $\Sigma$, where a rule is one of the following:
@@ -119,7 +129,9 @@ vertices to which it can be applied.
 For any $S\in \RuleSeq$, we define the function
 $f_S : \Graphs_{\Sigma} \to \Set{0,1}$ as follows:
 $$f_S(G) = \begin{cases}
-    1 &\,\text{if after $100 |V(G)|$ steps of ${\step{S}}$ starting with $G$ a steady state is reached in which the graph is connected}\\
+    1 &\,\text{if after $N |V(G)|$ steps of ${\step{S}}$ starting with $G$ a
+    stable, fully-connected graph is formed (meaning, we have executed all rules in the rule
+    sequence, or a rule cannot be applied).}\\
     0 &\,\text{otherwise}
   \end{cases}$$
 
@@ -127,9 +139,52 @@ Our concept class will be
 $\Concepts_\Sigma = \Setbar{f_S}{S\in \RuleSeq_\Sigma}$. Our hypothesis
 class will be $\Hypotheses_{\Sigma} = \Concepts_\Sigma$.
 
-We will be interested in the following question: Can we PAC-learn (or
+We are interested in the following question: Can we PAC-learn (or
 efficiently PAC-learn) a hypothesis $h \in \Hypotheses$ given
 equivalence queries and memebership queries?
+
+**Definition [@kearns1994]:** a concept class $C$ over instance space $X$
+PAC-reduces to the concept class $C'$ over instance space $X'$ if the following
+conditions are met:
+
+-   *Efficient Instance Transformation:* There exists a mapping $G: X_n \to
+    X'_{p(n)}$ for all $n$ and some polynomial $p$ which is computable in
+    polynomial time.
+-   *Existence of Image Concept:* For all $c \in C_n$, there is a concept $c'
+    \in C'_{p(n)}$ such that $size(c') \leq q(size(c))$ for some polynomials $p$
+    and $q$. Additionally, for all $x \in X_n$, $c(x) = 1$ if and only if
+    $c'(G(x)) = 1$.
+
+Preliminary Work
+----------------
+
+
+**Theorem:** the class of deterministic finite automata PAC-reduces to the class of
+node-conserving graph rewriting rulesets which
+achieve full connectivity after $k |V(G)|$ steps on graph $G$.
+
+**Proof:**
+
+We describe for each DFA $D$ a polynomially sized ruleset that
+simulates $D$ on transformed instances.
+
+### Instance Transformation
+
+We define a transformation $G: \{0,1\}^n
+\to G_{p(n)}$ from the space of binary DFA inputs of length $n$ to the space of
+graphs with a number of vertices polynomial in $n$.
+
+Take an instance $x \in \{0,1\}^n$. For each character $s \in x$, create a pair of
+vertices. Label one vertex $a$, and label the other with $b_0$ if $s=0$ and
+$b_1$ if $s=1$. Add one more vertex to the graph and label it $\$$.
+
+If the DFA transitions from state $S$ to state $T$ when it consumes character
+$s$
+
+### Image Concept
+
+For each state $s \in D$, 
+
 
 Citations
 ---------
