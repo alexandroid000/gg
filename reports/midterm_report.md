@@ -38,7 +38,7 @@ unpredictable, under the definition from [@kearns1994]:
 > polynomially evaluatable hypothesis class $H$.
 
 Specifically, we show that learning graph grammars which lead to to stable,
-fully-connected assemblies is inherently unpredictable by reduction to learning
+connected assemblies is inherently unpredictable by reduction to learning
 DFAs. We also outline the next areas of investigation in this project.
 
 Refinement of Project Scope
@@ -91,7 +91,7 @@ rewriting specifications can be used for decision procedures.
 In this paper, we
 will examine the case where we apply a given sequence of rules for a number of
 iterations that is proportional to the size of the overall graph. After this
-number of rewrites, we examine the graph - if it is fully connected, we consider
+number of rewrites, we examine the graph - if it is connected, we consider
 this an "accepting" state, and otherwise we reject.
 
 Additionally, we will consider only *node-preserving* rewrites, in which the
@@ -129,7 +129,7 @@ For any $S\in \RuleSeq$, we define the function
 $f_S : \Graphs_{\Sigma} \to \Set{0,1}$ as follows:
 $$f_S(G) = \begin{cases}
     1 &\,\text{if after $N |V(G)|$ steps of ${\step{S}}$ starting with $G$ a
-    stable, fully-connected graph is formed.}\\
+    stable, connected graph is formed.}\\
     0 &\,\text{otherwise}
   \end{cases}$$
 
