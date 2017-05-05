@@ -1,0 +1,339 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\hypersetup{
+            pdftitle={CS 476 Intermediate Report},
+            pdfauthor={Alli Nilles (nilles2) and Spencer Gordon (slgordo2)},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=2cm]{geometry}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{jeffe, graphicx, mathtools, tikz, xspace}
+\usetikzlibrary{arrows.meta}
+\usepackage[charter]{mathdesign}
+\makeatother
+\DeclareMathOperator{\attach}{attach}
+\DeclareMathOperator{\relabel}{relabel}
+\DeclareMathOperator{\detach}{detach}
+\def\RuleSeq{\mathrm{RuleSeq}\xspace}
+\def\Graphs{\mathcal{G}\xspace}
+\def\Concepts{\mathcal{C}\xspace}
+\def\Hypotheses{\mathcal{H}\xspace}
+\def\ruleseq{\rho\xspace}
+
+\title{CS 476 Final Report}
+\author{Alli Nilles (\texttt{nilles2}) and Spencer Gordon (\texttt{slgordo2})}
+\date{}
+
+\begin{document}
+\maketitle
+
+\newcommand{\step}[1]{\xrightarrow{#1}}
+\newcommand{\steps}[1]{\xRightarrow{#1}}
+
+Brainstorm April 4
+==================
+
+Open questions:
+
+-   It is possible to compute a counterexample of (polynomial / bounded) size,
+    given the target and hypothesis rulesets?
+-   How does adding another query type - the ability to apply the target ruleset
+    to any given graph for one rewriting step - change learnability?
+-   Does our DFA reduction (from progress report) still go through if we can use
+    only binary rewrite rules, and no ternary rules?
+-   How does restricting rule sets to unary and binary rules, and adding
+    "one-step" queries, affect learnability?
+-   Does the VC-dimension of a ruleset concept class grow polynomially with the
+    size of the ruleset?
+-   Are all "minimal" rulesets distinguishable? If not, what are the equivalence
+    classes?
+
+Related Work
+============
+
+### Learning compact rule sets for generating a given graph
+
+
+
+### Decidability of termination
+
+Old
+===
+
+
+In our project proposal, motivated by applications in self-assembling
+robotic system, we asked ``Might it be possible to learn compact rule
+sets that generate stable assemblies, or dynamics on graphs that are
+recurrent?''
+
+We then proposed a framework for learning functions from rule sets to
+steady-state graph dynamics. In the course of the project, we have so
+far focused on surveying known computational learning theory results for
+learning grammars, as well as surveying known results in the theory of
+graph grammars.
+
+We show that a particular formulation of a concept class is inherently
+unpredictable, under the definition from \cite{kearns1994}:
+
+\begin{quote}
+A concept class \(C\) is \emph{inherently unpredictable} if the VC
+dimension of \(C_n\) is polynomial in \(n\), yet \(C\) is not
+efficiently PAC learnable using any polynomially evaluatable hypothesis
+class \(H\).
+\end{quote}
+
+Specifically, we show that learning graph grammars which lead to to
+stable, connected assemblies is inherently unpredictable by reduction to
+learning DFAs. We also outline the next areas of investigation in this
+project.
+
+\section{Refinement of Project
+Scope}\label{refinement-of-project-scope}
+
+We first recall the definition of graph grammars \cite{litovsky}
+\cite{klavins}:
+
+We consider \emph{simple labelled graphs}, \(G = (V,E,l)\) where \(V\)
+is an indexed set of vertices, \(E\) a set of edges between pairs from
+\(V\), and \(l: V \to \Sigma\) is a labelling or coloring function mapping to a
+finite alphabet $\Sigma$.
+
+A \textbf{rule} is a pair of graphs \(r=(L,R)\) (for \emph{left} and
+\emph{right}), where \(V_L = V_R\). A \emph{unary} rule has a vertex set
+of size one, a \emph{binary} rule is on two vertices, etc. A rule can
+change labels and add/delete edges, but cannot add or remove nodes.
+Rules also require (implicit or explicit) \emph{embedding mechanisms}
+which specify how these graphs should affect connections to a larger
+graph in which they are embedded.
+
+A \textbf{grammar} is a set of rules. These rules are applied
+ to a graph to define a transition system. Transitions occur
+when the left hand side of a rule is isomorphic to a subgraph, replacing it 
+with the right hand side of the rule.
+
+\subsubsection{Context-Free vs.~Context-Sensitive Graph
+Grammars}\label{context-free-vs.context-sensitive-graph-grammars}
+
+If we relax the assumption that rules cannot add or remove vertices, we
+can form a natural division of graph grammars into context-free and
+context-sensitive grammars. Context-free grammars take a single labelled
+node as the left hand side of rules, and rewrite it to an arbitrary graph on
+the right hand side of the rule. These grammars are also
+often restricted to be \emph{confluent}, such that reordering a
+sequence of rule applications does not change the outcome of the graph
+transformation. This area has been the focus of the majority of
+attention in the graph grammars community thus far.
+
+Motivated by self-assembling robotic systems, we focus on context-sensitive
+graph grammars: often, we have a collection of $n$ robots and wish to synthesize a
+set of locally executable rules, which when applied to an entire collection of
+robots, form a connected assembly with certain topological or connectivity
+properties. We do not want to have to create or destroy robots in the course of
+this task, and thus require context-sensitive graph grammars.
+
+\subsection{Our concept class of
+  interest}\label{our-concept-class-of-interest}
+
+We have so far focused on a very restricted model of a context-sensitive graph
+grammar, which we describe completely here.
+
+In order to start talking about \emph{learning} graph grammars, we need a way of
+taking a graph grammar and using it to classify an input graph. We came up with
+the idea of classifying a problem instance - given by an input graph and a
+grammar - according to the graph's connectivity after some reasonable number of transformations.
+
+We consider labeled graphs $G = (V,E,\ell)$ as above where $V = [k]$ for some
+$k\in \N$. Let $\Graphs_{k,\Sigma}$ be the set of all such labeled graphs with
+$V=[k]$ and labels over the alphabet $\Sigma$.
+
+If we allowed only a fixed number of transformations according to a grammar for
+any graph, graphs above a certain size would be indistinguishable for any given
+concept, since there simply wouldn't be enough time for a rule to apply to each
+vertex in the graph and form one connected component.
+
+As a result, we are considering a concept class in which the number of allowed
+operations was a function of the size of the graph.
+
+\subsubsection{Concept Class Definition}
+
+A \textbf{rule} $r \in R_{\Sigma}$ is a pair of graphs
+$r \in \Graphs_{k,\Sigma}^2$ with $k \leq 3$.
+
+Two graphs $G,G' \in \Graphs$ are related by the \textbf{application} of rule
+$r = (H,H')$, written $G \step{r} G'$ if there exists a subgraph $J \subset G$
+isomorphic to $H$ and $G'$ is equal to $G$ with $J$ replaced by $J'$ where $J'$
+is isomorphic to $H'$ under the same permutation for which $J$ was isomorphic to
+$H$. Moreover, it has to be the case that if there all multiple such sugraphs
+$J$ isomorphic to $H$, the lexicographically least such one is chosen.
+In other words, $G \step{r} G'$ if you can get $G'$ by replacing the
+lexicographically least $H$-isomorphic subgraph of $G$ with a corresponding
+$H'$-isomorphic graph.
+
+The \textbf{set of all sequences of rules} is given by
+$\RuleSeq_{\Sigma} = R_{\Sigma}^*$. We define the semantics of a rule sequence
+$\rho = r_1r_2\dotsm r_m \in \RuleSeq_{\Sigma}$ as follows: We define a relation
+$\step{\rho}$ such that $G \step{\rho} G'$ if and only if there exists an
+$i\leq m$ such that $G\step{r_i} G'$ and there does not exist a subgraph
+$H \subseteq G$ isomorphic to the left-hand side of any rule $r_j$ for all
+$j < i$. Intuitively, two graphs are related by $\rho$ if they differ by the
+application of the lexicographically least rule in $\rho$ that is applicable to
+$G$. In this way, we define an \emph{ordering} of the rules so that we always apply
+the first rule that matches the current graph.
+
+To write down a rule over graphs of size $3$ with labels from $\Sigma$, we will
+introduce notation to describe small graphs compactly. For a graph on three
+vertices we can write down a sequence of three labels $ABC \in \Sigma$ and add
+the $|$ character between pairs of symbols or after the last symbol to indicate
+that there is no edge between the pair of vertices around the $|$ or between the
+first and last vertex, respectively.
+
+Thus, $AAA$ denotes a triangle graph with every vertex labeled $A$, and $A|A|A|$
+denotes the graph of 3 vertices labeled $A$ with no edges. Under this notation,
+the following graphs are isomorophic: $A|AA = AA|A = AAA|$.
+
+We can define an iterated version of the relation $\step{\rho}$, denoted
+$\steps{\rho}_i$, where $G \steps{\rho}_i G'$ if there is a sequence of exactly
+$i$ steps $G$ transforming $G$ into $G'$ under $\rho$.
+
+Finally, since there is a unique next graph under this model of graph grammar
+(since the rule application is deterministic) we can treat $\rho$ as a function,
+and write $\rho(G)$ for the graph obtained by a single step under $\rho$. We'll
+define $\rho(G) =G$ if no rules in $\rho$ apply to $G$. We'll write $\rho^i(G)$
+for the $i$-th iterated application of $\rho$ to $G$.
+
+We now define a function $f_{\rho,c} : \Graphs_{\Sigma} \to \Set{0,1}$ as follows:
+\[f_{\rho,c}(G) = \begin{cases}
+    1 &\,\text{if $\rho^{c\Card{V(G)}}(G) = \rho^{c\Card{V(G)}+1}(G)$ and $\rho^{c\Card{V(G)}}(G)$ is connected}\\
+    0 &\,\text{otherwise}
+  \end{cases}\]
+
+Our concept class will be
+\(\Concepts_{\Sigma,c} = \Setbar{f_{\rho,c}}{\rho\in \RuleSeq_\Sigma}\).
+
+As in the proof of Kearns and Vazirani that DFA are inherently unpredictable, we
+consider the restriction of our concept class to inputs of a given size $n$,
+where $n$ is the number of vertices of the graph classified by a concept. We
+write this restriction as $\Concepts_{\Sigma,c,n}$.
+
+With this definition, the first question we wanted to address was whether this
+concept class was PAC-learnable. We will now show that it is at least as
+hard as learning the concept class of DFAs since we can reduce learning a DFA to
+learning a graph grammar of this form.
+
+\section{Reduction from learning DFAs}
+
+\textbf{Definition \cite{kearns1994}:} a concept class \(C\) over
+instance space \(X\) PAC-reduces to the concept class \(C'\) over
+instance space \(X'\) if the following conditions are met:
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Efficient Instance Transformation:} There exists a mapping
+  \(G: X_n \to X'_{p(n)}\) for all \(n\) and some polynomial \(p\) which
+  is computable in polynomial time.
+\item
+  \emph{Existence of Image Concept:} For all \(c \in C_n\), there is a
+  concept \(c' \in C'_{p(n)}\) such that \(size(c') \leq q(size(c))\)
+  for some polynomials \(p\) and \(q\). Additionally, for all
+  \(x \in X_n\), \(c(x) = 1\) if and only if \(c'(G(x)) = 1\).
+\end{itemize}
+
+Since the concept class $\Concepts_{\Sigma,c,n}$ is isomorphic to $\Concepts_{\Delta,c,n}$ for any $\Card{\Sigma} = \Card{\Delta}$, we'll write $\Concepts_{l,c,n}$ to denote the concept class for any label alphabet of size $l$. 
+
+\textbf{Theorem:} the class of deterministic finite automata with $m$ states
+over an alphabet of size $l$ PAC-reduces to the class $\Concepts_{l+4+m,2}$,
+i.e., the class of concepts corresponding to the connectivity of graph grammars
+after $2\Card{V(G)}$ steps, over alphabets of size $l+m+4$.
+
+\textbf{Proof:}
+We describe for each DFA $D=(Q,\Sigma,\delta,q_0,F)$ a polynomially sized ruleset that
+simulates \(D\) on transformed instances.
+
+We'll transform strings in $\Sigma^n$ into graphs with $2n+2$ vertices over the alphabet $Q\cup\Sigma\cup \Set{A,T,Z}$ where $A,T,Z$ are symbols distinct from any in $\Sigma\cup Q$.
+
+\textbf{Instance Transformation:} 
+Given a string $x = x_1x_2\dotsm x_n$, we let $G = ([2n+2],E,\ell)$ be the graph where
+
+$\ell(2i+1) = x_i$, $\ell(2i) = A$ for $i < n+1$, $\ell(1) = q_0$ and $\ell(2n+2) = T$.
+
+We choose the edges as follows: $E = \Set{(2i,2i+2),(2i,2i+1)}{i\in [n]} \cup \Set{(1,2)}$.
+
+\textbf{Image Concept:}
+We now define the rule sequence $\rho$ as follows:
+
+For every state $q\in Q$ and every symbol $a\in \Sigma$ in the DFA, we add a rule corresponding to the transition $\delta(q,a)$.
+
+Particularly, we add a rule of the form $(qAa|, A|\delta(q,a)|A|)$, simulating
+each of the non-terminating transitions of the DFA. The order of
+these rules doesn't matter since only one of them can be active at a time.
+
+We then add a rule $(qT, AZ)$ for each $q\in F$, and a rule $(A|Z,AZ)$, thus
+simulating each of the transitions to an accepting state in the DFA, and
+guaranteeing that an accepting state corresponds to a connected graph.
+
+The resulting concept and instance satisfy the requirements for the reduction,
+proving the result above.
+
+\subsection{Next Steps}
+
+In order to show that these concepts are inherently unpredictable, we next have
+to show that they have polynomial VC-dimension. This is the next question we'd
+like to address. After doing this, we would want to see if we can get a positive
+result showing the PAC-learnability of this concept class under a stronger
+learning model, perhaps in which the learner can make membership queries or
+equivalence queries.
+
+
+\bibliographystyle{ieeetr}
+\bibliography{refs}
+
+\end{document}
