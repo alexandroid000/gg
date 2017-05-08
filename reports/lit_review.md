@@ -3,16 +3,6 @@ Handbook of Graph Grammars and Computing by Graph Transformation - Rozenberg - 1
 
 volume 1. very helpful overview
 
-MDL-Based Context-Free Graph Grammar Induction and Applications - Jonyer Holder Cook - 2003
-===========================================================================================
-
-Abstract: We present an algorithm for the inference of context-free graph gramma
-rs from examples. The algorithm builds on an earlier system for frequent
-substructure discovery, and is biased toward grammars that minimize description
-length. Grammar features include recursion, variables and relationships. We
-present an illustrative example, demonstrate the algorithm's ability to learn in
-the presence of noise, and show real-world examples.
-
 Concept Formation Using Graph Grammars - Jonyer Holder Cook - 2002
 ==================================================================
 
@@ -31,6 +21,17 @@ Notes
 -----
 
 Context-free, infers productions that can create graph from single node
+
+MDL-Based Context-Free Graph Grammar Induction and Applications - Jonyer Holder Cook - 2003
+===========================================================================================
+
+Abstract: We present an algorithm for the inference of context-free graph gramma
+rs from examples. The algorithm builds on an earlier system for frequent
+substructure discovery, and is biased toward grammars that minimize description
+length. Grammar features include recursion, variables and relationships. We
+present an illustrative example, demonstrate the algorithm's ability to learn in
+the presence of noise, and show real-world examples.
+
 
 Learning Node Replacement Graph Grammars in Metabolic Pathways - Kukluk You Holder Cook - 2007
 ==============================================================================================
@@ -65,3 +66,45 @@ grammar. The inferred grammar assigns high probability to the graphs from which
 it was learned and low probability to other graphs. We report results of
 preliminary experiments in which inferred graph grammars are compared to target
 grammars used to generated training data.
+
+Notes
+----
+
+Seems to be a student research paper.
+
+Thermodynamic Graph-Rewriting - Danos Harmer Honorato-Zimmer - 2015
+===================================================================
+
+Abstract
+--------
+
+We develop a new thermodynamic approac to stochastic graph-rewriting. The
+ingredients are a finite set of reversible graph-rewriting rules G (called
+generating rules), a finite set of connected graphs P (called energy patterns),
+and an energy cost function $\epsilon$ which associates real values to each of
+these energy patterns. The idea is that $G$ defines the qualitative dynamics, by
+showing which transformations are possible, while $P$ and $\epsilon$ allow one
+to attach an energy to the reachable graphs and, thereby, describe their
+long-term probability distribution $\pi$. Given $G$ and $P$, we construct a
+finite set of rules $G_P$ which (i) has the same qualitative transition system
+as $G$; and (ii) when equipped with rates according to $\epsilon$, defines a
+continuous-time Markov chain of which $\pi$ is the unique fixed point. The
+construction relies on the use of site graphs and a technique of 'growth policy'
+for quantitative rule refinement which is of independent interest.
+
+This division of labour between the qualitative and long-term quantitative
+aspects of the dynamics leads to intuitive and concise descriptions for
+realistic models. It also guarantees thermodynamical consistency (aka detailed
+balance), otherwise known to be undecidable, which is important for some
+applications. Finally, it leads to parsimonious parameterizations of models,
+again an important point in some applications.
+
+Learning to Transform Linguistic Graphs - Jijkoun Rijke - 2007
+==============================================================
+
+We argue in favor of the use of labeled directed graph to represent various
+types of linguistic structures, and illustrate how this allows one to view NLP
+tasks as graph transformations. We present a general method for learning such
+transformations from an annotated corpus and describe experiments with two
+applications of the method: identification of non-local dependencies (using Penn
+Treebank data) and semantic role labeling (using Proposition Bank data). 

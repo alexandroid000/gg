@@ -69,7 +69,7 @@
 \def\ruleseq{\rho\xspace}
 
 \title{CS 476 Final Report}
-\author{Alli Nilles (\texttt{nilles2}) and Spencer Gordon (\texttt{slgordo2})}
+\author{Spencer Gordon (\texttt{slgordo2}) and Alli Nilles (\texttt{nilles2})}
 \date{}
 
 \begin{document}
@@ -78,21 +78,7 @@
 \newcommand{\step}[1]{\xrightarrow{#1}}
 \newcommand{\steps}[1]{\xRightarrow{#1}}
 
-% Brainstorm May 4
-% ==================
-
-% Related Work
-% ============
-
-% ### Learning compact rule sets for generating a given graph
-
-
-
-% ### Decidability of termination
-
-% Old
-% ===
-
+\section{Introduction}
 
 In our project proposal, motivated by applications in self-assembling
 robotic system, we asked ``Might it be possible to learn compact rule
@@ -115,13 +101,12 @@ efficiently PAC learnable using any polynomially evaluatable hypothesis
 class \(H\).
 \end{quote}
 
-Specifically, we show that learning graph grammars which lead to to
-stable, connected assemblies is inherently unpredictable by reduction to
-learning DFAs. We also outline the next areas of investigation in this
-project.
+Specifically, we take the first steps toward showing that learning graph
+grammars which lead to to stable, connected assemblies is inherently
+unpredictable by reduction to learning DFAs. We also outline the next areas of
+investigation in this project.
 
-\section{Refinement of Project
-Scope}\label{refinement-of-project-scope}
+\section{Definitions}\label{definitions}
 
 We first recall the definition of graph grammars \cite{litovsky}
 \cite{klavins}:
@@ -164,8 +149,88 @@ robots, form a connected assembly with certain topological or connectivity
 properties. We do not want to have to create or destroy robots in the course of
 this task, and thus require context-sensitive graph grammars.
 
-\subsection{Our concept class of
-  interest}\label{our-concept-class-of-interest}
+\section{Related Work}
+
+One thing to note about related work is that there are many different
+formulations of graph rewriting systems - the most obvious is context-free vs.
+context-sensitive, but there are many other small variations. For instance, we
+may allow labelled or directed edges, instead of undirected unlabelled edges as
+in our analysis.
+
+There is also a significant amount of work on rewriting in the context of
+\emph{site graphs}, also known as typed graphs, which allow for additional
+structure on the kinds of connections that can be made between nodes in the
+graph to be rewritten. This formulation has been extensively developed for
+modelling protein interaction networks, though there has been little
+investigation into machine learning in this context.
+
+\subsection{Learning compact rule sets for generating a given graph}
+
+One common application of machine learning on graph rewriting systems is for
+data mining. The goal is to learn a concise representation of common structures
+in data represented as graphs, and use this representation to classify new input
+graphs. Thus, in the graph grammars context, we can think of this task as
+learning a graph parser which will "accept" certain types of graphs and not
+others. In \cite{jonyer2002concept} and \cite{jonyer2004mdl}, they outline an
+algorithm for learning recursive graph grammars from a single input graph, which
+utilizes an algorithm for finding the most common substructures in graphs. The
+graph grammar learned is necessarily context-free. In \cite{jonyer2004mdl}, the
+authors described preliminary experiments in concept formation for graph
+grammars, using one positive and one negative example and learning a grammar
+which recognizes the positive example but not the negative example. However,
+work along these lines appears to have not been continued by the authors. They
+did show the usefulness of the technique in inferring graph grammars from
+metabolic pathway data \cite{kukluk2007learning}, finding common structures
+in metabolic pathways within one organism and in a specific process across
+multiple organisms. The algorithm is able to take multiple graphs as input and
+infer one resulting grammar, and is biased to find the grammar with the minimum
+description length.
+
+\subsection{Stochastic Graph Grammars}
+
+Often, it could be useful to synthesize graphs with certain commonly-seen
+structures - such as graphs representing metabolic pathways in several different
+types of organisms, or chemical compounds with useful properties. In this case,
+a large corpus of graphs is the input domain and the concept to be learned is a
+stochastic graph grammar - a graph grammar with a real-valued probability
+assigned to each rule in the production. Instead of each rule being applied
+nondeterministically, the rules will be applied according to the learned
+probability distribution.
+
+In \cite{oates2003estimating}, an algorithm is described to estimate the
+probability distribution for a stochastic graph grammar, given a grammar
+structure and a set of graphs. They use Expectation Maximization and show that
+for a certain class of graphs and grammars (context free, with some techical
+conditions on the separability of the graphs) the parameter estimation can be
+done in polynomial time.
+
+\subsection{Context-Sensitive Graph Grammars}
+
+Learning distributions over stochastic graph grammars has also been used in
+computer vision applications \cite{zhu2007stochastic}. This work is one of few
+that we have found which learns context-sensitive graph grammars, to some
+success, though recent advances in deep neural networks appear to have outpaced
+these results.
+
+Another area which often requires context-sensitive graph grammars is natural
+language processing. There are many examples of natural language sentences which
+perhaps can be more effectively modelled with graph-based data structures
+rather than trees, to encode non-local dependencies. Some examples include
+\emph{"What I just said, though I cannot be completely sure, is perhaps real"}
+\cite{zhu2007stochastic} or \emph{"Directors this month planned to seek more
+seats"} \cite{jijkoun2007learning}. In \cite{jijkoun2007learning}, they use
+directed, edge-labelled graphs and transformation-based learning and formulate
+NLP tasks, such as identifying non-local dependencies and semantic role
+labelling, as context-sensitive graph rewriting problems, to mixed success.
+
+\subsection{Category Theoretic Interpretation}
+
+To do?
+
+
+
+
+\section{The Learning Problem}\label{the-learning-problem}
 
 We have so far focused on a very restricted model of a context-sensitive graph
 grammar, which we describe completely here.
@@ -187,7 +252,7 @@ vertex in the graph and form one connected component.
 As a result, we are considering a concept class in which the number of allowed
 operations was a function of the size of the graph.
 
-\subsubsection{Concept Class Definition}
+\subsection{Concept Class Definition}
 
 A \textbf{rule} $r \in R_{\Sigma}$ is a pair of graphs
 $r \in \Graphs_{k,\Sigma}^2$ with $k \leq 3$.
@@ -309,21 +374,92 @@ The resulting concept and instance satisfy the requirements for the reduction,
 proving the result above.
 
 \subsection{Questions}
-In order to complete the proof that our concept class is inherently unpredictable (and thus unlikely to be PAC-learnable assuming standard cryptographic hardness assumptions), we would need to show that our concept class has VC-dimension that grows polynomially with the input size, and with size of the concept. We attempted to do this but ran into many problems that proved insurmountable. Most of these problems are the result of the strangeness of our concept class, which does not seem particularly natural and is hard to analyze and understand. An easier task that was achievable for DFA but which we couldn't replicate for our concept class was that of identifying a polynomially-bounded witness that is a counterexample to the claim that a hypothesized concept is equivalent to a target concept. With DFA, there is an algorithm running in polynomial time for finding a string for which two DFA disagree assuming they are not equivalent. We were not able to find such an algorithm for our concept class.
 
-Having failed in our attempts to establish the properties enjoyed by DFAs for our concept class, we tried to attack the other direction of the problem, by showing that under certain assumptions this class was PAC-learnable. Since DFAs can be learned with membership and equivalence queries, we attempted to carry through a similar result for our concept class. Unfortunately, the DFA result requires efficient counterexamples to be generated by equivalence queries, which we couldn't do for our concept class.
+In order to complete the proof that our concept class is inherently
+unpredictable (and thus unlikely to be PAC-learnable assuming standard
+cryptographic hardness assumptions), we would need to show that our concept
+class has VC-dimension that grows polynomially with the input size, and with
+size of the concept. We attempted to do this but ran into many problems that
+proved insurmountable. Most of these problems are the result of the strangeness
+of our concept class, which does not seem particularly natural and is hard to
+analyze and understand. An easier task that was achievable for DFA but which we
+couldn't replicate for our concept class was that of identifying a
+polynomially-bounded witness that is a counterexample to the claim that a
+hypothesized concept is equivalent to a target concept. With DFA, there is an
+algorithm running in polynomial time for finding a string for which two DFA
+disagree assuming they are not equivalent. We were not able to find such an
+algorithm for our concept class.
 
-We next tried to extend the model of learning to allow for access to an oracle that will take an input graph and rewrite it by applying one step of the rewriting relation. While under this assumption, it's clear that we can learn the set of rules present in a given concept in time polynomial in the maximum arity of the rules, we couldn't do this without being exponential in the number of labels on vertices. Moreover, we couldn't figure out how to determine the ordering or multiplicity of rules once we knew the underlying set of rules present, since the same rule could be repeated multiple times to take effect at different stages of the rewriting procedure.
+Having failed in our attempts to establish the properties enjoyed by DFAs for
+our concept class, we tried to attack the other direction of the problem, by
+showing that under certain assumptions this class was PAC-learnable. Since DFAs
+can be learned with membership and equivalence queries, we attempted to carry
+through a similar result for our concept class. Unfortunately, the DFA result
+requires efficient counterexamples to be generated by equivalence queries, which
+we couldn't do for our concept class.
 
-Given our failures to come up with any sort of characterization of our concept class that would allow for proving the sorts of results that would be needed to come up with an algorithm for learning the class, we next considered limiting the concept class even further by considering only binary rewrite rules. We believe that this is still hard, and that the reduction from DFA learning to this concept class would still go through with only minor modifications, but we weren't able to complete the reduction in the time remaining after deciding to think about this question. 
+We next tried to extend the model of learning to allow for access to an oracle
+that will take an input graph and rewrite it by applying one step of the
+rewriting relation. While under this assumption, it's clear that we can learn
+the set of rules present in a given concept in time polynomial in the maximum
+arity of the rules, we couldn't do this without being exponential in the number
+of labels on vertices. Moreover, we couldn't figure out how to determine the
+ordering or multiplicity of rules once we knew the underlying set of rules
+present, since the same rule could be repeated multiple times to take effect at
+different stages of the rewriting procedure.
 
-On the other hand, it seems likely that we should be able to learn this concept class if we allow single-step queries, along with membership and equivalence queries, though again we weren't able to prove this.
+Given our failures to come up with any sort of characterization of our concept
+class that would allow for proving the sorts of results that would be needed to
+come up with an algorithm for learning the class, we next considered limiting
+the concept class even further by considering only binary rewrite rules. We
+believe that this is still hard, and that the reduction from DFA learning to
+this concept class would still go through with only minor modifications, but we
+weren't able to complete the reduction in the time remaining after deciding to
+think about this question.
 
-Another more fundamental question is whether or not all ``minimal'' rule sequences are distinguishable. Clearly, a rule sequence that contains the same rule repeated consecutively is equivalent to a rule sequence in which no rule is repeated consecutively, but given any two such rule sequences, are there guaranteed to be graphs on which they act differently. For DFA, any two minimal DFA disagree on some string of reasonable length. We don't believe that this is the case for our concept class, but again haven't been able to prove it. The intuition for why this shouldn't be the case is that the following ruleset wold seem to be a counterexample: Pick some arbitrary ordering of the labels in the given alphabet. Now the rule sequence should consists of all ternary rules that take triples of vertices and fully connect them while updating the label of each involved vertex to some later label in the ordering. Such a rule sequence should result in the graph being fully connected, no matter the order of the rules involved, and would witness the fact that there are distinct minimal rule sequences that behave identically on all graphs.
+On the other hand, it seems likely that we should be able to learn this concept
+class if we allow single-step queries, along with membership and equivalence
+queries, though again we weren't able to prove this.
 
-If that is indeed the case, we can then ask whether it's possible to come up with equivalence classes of rule sequences, and learn cannonical representatives from each equivalence class. We do not know the answer to this question. 
+Another more fundamental question is whether or not all ``minimal'' rule
+sequences are distinguishable. Clearly, a rule sequence that contains the same
+rule repeated consecutively is equivalent to a rule sequence in which no rule is
+repeated consecutively, but given any two such rule sequences, are there
+guaranteed to be graphs on which they act differently. For DFA, any two minimal
+DFA disagree on some string of reasonable length. We don't believe that this is
+the case for our concept class, but again haven't been able to prove it. The
+intuition for why this shouldn't be the case is that the following ruleset wold
+seem to be a counterexample: Pick some arbitrary ordering of the labels in the
+given alphabet. Now the rule sequence should consists of all ternary rules that
+take triples of vertices and fully connect them while updating the label of each
+involved vertex to some later label in the ordering. Such a rule sequence should
+result in the graph being fully connected, no matter the order of the rules
+involved, and would witness the fact that there are distinct minimal rule
+sequences that behave identically on all graphs.
 
-Given the difficulties presented by our concept class, it's worth considering whether an alternative concept class would be better suited to exploring the learnability of graph rewriting rules. To address, this we recall the desiderata any reasonable hypothesis class would have. First, it should be possible to evaluate a given hypothesis on an instance in polynomial time. This turned out to be the biggest issue for our project, since finding such a concept/hypothesis class was already difficult for graph rewriting systems which weouldn't even be guaranteed to terminate upon an instance if allowed to continue operating indefinitely. Second, the class should be relatively robust, and not be particularly sensitive to incidental details of our model. This we were unable to achieve, and our concept class is very fragile, and two rule sequences that differ by the addition of one useless step can differ in the number of steps they take to converge, so that one could classify an instance positively and the other negatively, by just having one take slightly more than $c\Card{V(G)}$ steps, and having the other take slightly less than $c\Card{V(G)}$ steps. As a result, we have little confidence in the generalizability of any of our results. We weren't to come up with a more robust concept class that better fit into the PAC-learning framework, even with the addition of equivalence and membership queries (or other additional queries we considered to make the problem easier).
+If that is indeed the case, we can then ask whether it's possible to come up
+with equivalence classes of rule sequences, and learn cannonical representatives
+from each equivalence class. We do not know the answer to this question.
+
+Given the difficulties presented by our concept class, it's worth considering
+whether an alternative concept class would be better suited to exploring the
+learnability of graph rewriting rules. To address, this we recall the desiderata
+any reasonable hypothesis class would have. First, it should be possible to
+evaluate a given hypothesis on an instance in polynomial time. This turned out
+to be the biggest issue for our project, since finding such a concept/hypothesis
+class was already difficult for graph rewriting systems which weouldn't even be
+guaranteed to terminate upon an instance if allowed to continue operating
+indefinitely. Second, the class should be relatively robust, and not be
+particularly sensitive to incidental details of our model. This we were unable
+to achieve, and our concept class is very fragile, and two rule sequences that
+differ by the addition of one useless step can differ in the number of steps
+they take to converge, so that one could classify an instance positively and the
+other negatively, by just having one take slightly more than $c\Card{V(G)}$
+steps, and having the other take slightly less than $c\Card{V(G)}$ steps. As a
+result, we have little confidence in the generalizability of any of our results.
+We weren't to come up with a more robust concept class that better fit into the
+PAC-learning framework, even with the addition of equivalence and membership
+queries (or other additional queries we considered to make the problem easier).
 
 \subsection{Next Steps}
 
